@@ -463,6 +463,11 @@ class ExpenseTracker:
             messagebox.showwarning("Ошибка", "Введите месяц в формате ГГГГ-ММ")
             return
         over = get_over_limit_categories(year_month)
+        if over:
+            msg = "Внимание! Превышен лимит по категориям:\n"
+            for name, limit, spent in over:
+                msg += f"• {name}: потрачено {spent} руб., лимит {limit} руб.\n"
+            messagebox.showwarning("Превышение лимита", msg)
         self.limit_text.delete(1.0, tk.END)
         if not over:
             self.limit_text.insert(tk.END, "Нет категорий с превышением лимита.")
