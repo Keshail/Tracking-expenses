@@ -194,9 +194,11 @@ class ExpenseTracker:
         period_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
         tk.Label(period_frame, text="Показать расходы за:").pack(side=tk.LEFT, padx=5)
         self.period_var = tk.StringVar(value="current_month")
+        self.period_var.trace('w', lambda *args: self.toggle_month_entry())
         ttk.Radiobutton(period_frame, text="Текущий месяц", variable=self.period_var, value="current_month", command=self.refresh_expenses).pack(side=tk.LEFT, padx=5)
         ttk.Radiobutton(period_frame, text="Произвольный месяц", variable=self.period_var, value="custom", command=self.refresh_expenses).pack(side=tk.LEFT, padx=5)
         self.custom_month_entry = tk.Entry(period_frame, width=10, state='disabled')
+        self.custom_month_entry = tk.Entry(period_frame, width=10)
         self.custom_month_entry.pack(side=tk.LEFT, padx=5)
         tk.Button(period_frame, text="Выбрать", command=self.refresh_expenses).pack(side=tk.LEFT, padx=5)
 
@@ -216,6 +218,7 @@ class ExpenseTracker:
         self.expenses_tree.configure(yscrollcommand=scrollbar.set)
         self.expenses_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.toggle_month_entry()
 
     def refresh_expenses(self):
         for row in self.expenses_tree.get_children():
@@ -468,6 +471,13 @@ class ExpenseTracker:
             for name, limit, spent in over:
                 self.limit_text.insert(tk.END, f"⚠ {name}: потрачено {spent:.2f} руб. при лимите {limit:.2f} руб.\n")
                 self.limit_text.insert(tk.END, f"   Перерасход: {spent - limit:.2f} руб.\n\n")
+    
+    def toggle_month_entry(self):
+        if self.period_var.get() == "custom":
+            self.custom_month_entry.config(state='normal')
+        else:
+            self.custom_month_entry.config(state='disabled')
+            self.custom_month_entry.delete(0, tk.END)
 
 if __name__ == "__main__":
     init_db()
